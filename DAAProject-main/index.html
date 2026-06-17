@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompressionBuilder - Huffman & Optimal Merge</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="starfield"></div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <path d="M20 5L35 15V25L20 35L5 25V15L20 5Z" stroke="url(#grad1)" stroke-width="2" fill="none" />
+                    <path d="M20 15L28 20V28L20 33L12 28V20L20 15Z" fill="url(#grad2)" />
+                    <defs>
+                        <linearGradient id="grad1" x1="5" y1="5" x2="35" y2="35">
+                            <stop offset="0%" stop-color="#667eea" />
+                            <stop offset="100%" stop-color="#764ba2" />
+                        </linearGradient>
+                        <linearGradient id="grad2" x1="12" y1="15" x2="28" y2="33">
+                            <stop offset="0%" stop-color="#f093fb" />
+                            <stop offset="100%" stop-color="#f5576c" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>CompressionBuilder</span>
+            </div>
+            <p class="subtitle">Huffman Coding & Optimal Merge Pattern Visualization</p>
+        </header>
+
+        <div class="input-section glass-card">
+            <div class="mode-tabs">
+                <button class="tab-btn active" data-mode="text">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M4 4h12M4 8h12M4 12h8M4 16h8" stroke="currentColor" stroke-width="2" fill="none" />
+                    </svg>
+                    Text Compression
+                </button>
+                <button class="tab-btn" data-mode="file">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                            d="M13 3H7C5.89543 3 5 3.89543 5 5V15C5 16.1046 5.89543 17 7 17H13C14.1046 17 15 16.1046 15 15V5C15 3.89543 14.1046 3 13 3Z"
+                            stroke="currentColor" stroke-width="2" fill="none" />
+                        <path d="M8 7h4M8 10h4M8 13h2" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    File Compression
+                </button>
+            </div>
+
+            <div id="textMode" class="input-mode">
+                <h2>Input Text</h2>
+                <textarea id="inputText"
+                    placeholder="Enter or paste your text here to compress...&#10;&#10;Try something like: &quot;hello world hello&quot;"></textarea>
+            </div>
+
+            <div id="fileMode" class="input-mode hidden">
+                <h2>Upload File</h2>
+                <div class="file-upload-area" id="fileUploadArea">
+                    <input type="file" id="fileInput" accept=".txt,.md,.json,.csv,.xml,.log" hidden>
+                    <div class="file-upload-content">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <path d="M24 4L24 28M24 28L16 20M24 28L32 20" stroke="url(#uploadGrad)" stroke-width="3"
+                                stroke-linecap="round" />
+                            <path d="M8 32V40C8 42.2091 9.79086 44 12 44H36C38.2091 44 40 42.2091 40 40V32"
+                                stroke="url(#uploadGrad)" stroke-width="3" stroke-linecap="round" />
+                            <defs>
+                                <linearGradient id="uploadGrad" x1="8" y1="4" x2="40" y2="44">
+                                    <stop offset="0%" stop-color="#667eea" />
+                                    <stop offset="100%" stop-color="#764ba2" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <p class="upload-text">Drag & drop your file here or <span class="upload-browse">browse</span>
+                        </p>
+                        <p class="upload-hint">Supports: TXT, MD, JSON, CSV, XML, LOG</p>
+                    </div>
+                    <div class="file-info hidden" id="fileInfo">
+                        <div class="file-icon">📄</div>
+                        <div class="file-details">
+                            <div class="file-name" id="fileName">filename.txt</div>
+                            <div class="file-size" id="fileSize">0 KB</div>
+                        </div>
+                        <button class="file-remove" id="fileRemove">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="compressBtn" class="btn-primary">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 3L3 10L10 17M17 3L10 10L17 17" stroke="currentColor" stroke-width="2" fill="none" />
+                </svg>
+                Compress & Analyze
+            </button>
+        </div>
+
+        <div id="results" class="results hidden">
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M9 11H15M9 15H15M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12L19 10V19C19 20.1046 18.1046 21 17 21Z"
+                                stroke="currentColor" stroke-width="2" fill="none" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Original Size</div>
+                        <div class="stat-value" id="originalSize">0 bits</div>
+                    </div>
+                </div>
+
+                <div class="stat-card glass-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M8 7H16M8 11H16M8 15H12M6 21H18C19.1046 21 20 20.1046 20 19V5C20 3.89543 19.1046 3 18 3H6C4.89543 3 4 3.89543 4 5V19C4 20.1046 4.89543 21 6 21Z"
+                                stroke="currentColor" stroke-width="2" fill="none" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Compressed Size</div>
+                        <div class="stat-value" id="compressedSize">0 bits</div>
+                    </div>
+                </div>
+
+                <div class="stat-card glass-card highlight">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M13 7L9 12L13 17M17 7L13 12L17 17" stroke="currentColor" stroke-width="2"
+                                fill="none" />
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Compression Ratio</div>
+                        <div class="stat-value compression-ratio" id="compressionRatio">0%</div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Huffman Tree Visualization -->
+            <div class="section glass-card">
+                <h2>Huffman Tree</h2>
+                <div id="treeContainer" class="tree-container"></div>
+            </div>
+
+            <!-- Optimal Merge Pattern -->
+            <div class="section glass-card">
+                <h2>Optimal Merge Pattern</h2>
+                <div id="mergeSteps" class="merge-steps"></div>
+                <div class="merge-total">
+                    <strong>Total Merge Cost:</strong> <span id="totalCost">0</span>
+                </div>
+            </div>
+
+            <!-- Huffman Codes -->
+            <div class="section glass-card">
+                <h2>Huffman Codes</h2>
+                <div id="huffmanCodes" class="codes-grid"></div>
+            </div>
+
+            <!-- Encoded Output -->
+            <div class="section glass-card">
+                <h2>Encoded Binary</h2>
+                <div id="encodedText" class="encoded-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

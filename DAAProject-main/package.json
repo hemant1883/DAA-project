@@ -1,0 +1,16 @@
+{
+  "name": "compression-builder",
+  "version": "1.0.0",
+  "description": "Huffman Coding and Optimal Merge Pattern with C++ backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["huffman", "compression", "daa"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
